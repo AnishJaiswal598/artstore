@@ -1,3 +1,4 @@
+const { ServerDescription } = require("mongodb")
 const Artwork = require("../models/Artworks")
 
 // list all the artworks
@@ -7,7 +8,8 @@ const index = async(req,res,send)=>{
      {
          res.json({
              message:"heres the list of all the artworks",
-             list
+             list,
+             
          })
      }
      
@@ -43,7 +45,10 @@ const show = async(req,res,send)=>{
 const store = async(req,res,send)=>{
     try {
         let artwork = new Artwork({
-     
+     Image:req.body.Image,
+     description:req.body.description,
+     price:req.body.price,
+     features:req.body.features
         })
         const navin =await artwork.save()
         {
@@ -99,4 +104,4 @@ const remove = async(req,res,send)=>{
     }
 }
 
-module.exports={index,show,store,changes,remove}
+module.exports={index,show,store,changes,remove};
