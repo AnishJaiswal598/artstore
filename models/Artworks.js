@@ -4,16 +4,21 @@ const Schema = mongoose.Schema
 const artworkSchema = new Schema({
 Image:{},
 description:{
-    typeof:String,
+    type:String,
+    // required:true,
+    // unique:true
 },
 price:{
-    typeof:Number
+    type:Number
 },
 features:{
-    typeof:String
+    type:String
 },
 
-},{timestamps:true})
+}
+,
+{timestamps:true}
+)
 const Artwork = mongoose.model('Artwork',artworkSchema)
 
 module.exports= Artwork;
