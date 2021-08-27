@@ -2,17 +2,17 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 const orderSchema = new Schema({
-OrderNo:{
-typeof:Number,
-required:true
+    orderNo:{
+        type:Number
+        // required:true
+    },
+    artworkNo:{
+        type:Number
+        // required:true
 },
-ArtworkNo:{
-typeof:Number,
-required:true
-},
-Quantity:{
-    typeof:Number,
-    required:true
+    quantity:{
+        type:Number
+        // required:true
 }
 
 },{timestamps:true})

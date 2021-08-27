@@ -1,23 +1,25 @@
 const { ServerDescription } = require("mongodb")
+const { findByIdAndRemove } = require("../models/Artworks")
 const Artwork = require("../models/Artworks")
 
 // list all the artworks
 const index = async(req,res,send)=>{
     try {
-     const list = await Artwork.find()
+        const list = await Artwork.find()
      {
-         res.json({
-             message:"heres the list of all the artworks",
-             list,
-             
-         })
+             res.json({
+                message:"heres the list of all the artworks",
+                list,
+                
+            })
      }
      
-    } catch (error) {
-        res.json({
-            message:"an error occured",
-            error
-        })
+    } 
+    catch (error) {
+            res.json({
+                message:"an error occured",
+                error
+            })
     }
 }
 
@@ -33,11 +35,12 @@ const show = async(req,res,send)=>{
                 This
             })
         }
-    } catch (error) {
-        res.json({
-            message:"not able to find Artwork by its ID",
-            error
-        })
+    } 
+    catch (error) {
+            res.json({
+                message:"not able to find Artwork by its ID",
+                error
+            })
     }
 }
 
@@ -52,37 +55,42 @@ const store = async(req,res,send)=>{
         })
         const navin =await artwork.save()
         {
-           res.json({
+            res.json({
                 message:"new artwork added successfully",
                 navin
             })
         }
-    } catch (error) {
-        res.json({
-            message:"Not able to add artwork",
-            error
-        })
+    } 
+    catch (error) {
+            res.json({
+                message:"Not able to add artwork",
+                error
+            })
     }
 }
 
 //Updating an artwork by its ID
 
 const changes = async(req,res,send)=>{
-try {
+    try {
     let ArtworkID = req.body.ArtworkID
     let updateData={
-
+    Image:req.body.Image,
+     description:req.body.description,
+     price:req.body.price,
+     features:req.body.features
     }
-    const update = await findByIdAndUpdate(ArtworkID,{$set:updateData})
-    res.json({
-        message:"Artwork updated sucessfully",
-        update
-    })
-} catch (error) {
-    res.json({
-        message:"Artwork was not been able to get updated",
-        error
-    })
+    const update = await Artwork.findByIdAndUpdate(ArtworkID,{$set:updateData})
+            res.json({
+                message:"Artwork updated sucessfully",
+                update
+            })
+} 
+    catch (error) {
+            res.json({
+                message:"Artwork was not been able to get updated",
+                error
+            })
 }
 }
 
@@ -91,16 +99,18 @@ try {
 const remove = async(req,res,send)=>{
     try {
         let ArtworkID=req.body.ArtworkID
-         await findByIdAndDelete(ArtworkID)
+         await Artwork.findByIdAndDelete(ArtworkID)
         {
             res.json({
                 message:"Artwork removed successfully"
             })
         }
-    } catch (error) {
-        res.json({
-            message:"arror occured rmoving artwork"
-        })
+    } 
+    catch (error) {
+            res.json({
+                message:"arror occured rmoving artwork",
+                error
+            })
     }
 }
 
