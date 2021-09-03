@@ -1,1 +1,1 @@
-# artstore
+# Artstore- Unicode learnings
