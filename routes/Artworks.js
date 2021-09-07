@@ -1,12 +1,12 @@
-const express = require("express")
+const express = require('express');
+
 const router = express.Router();
-// const morgan = require('morgan')
-const artworkController = require('../controllers/artworksController')
+const artworkController = require('../controllers/artworksController');
 
-    router.get('/',artworkController.index)
-    router.post('/show',artworkController.show)
-    router.post('/update',artworkController.changes)
-    router.post('/store',artworkController.store)
-    router.post('/delete',artworkController.remove)
+router.get('/listAll', artworkController.listAllArtworks); // listing all artworks
+router.get('/showByID', artworkController.artworkbyID); // listing artwork by ID
+router.post('/add', artworkController.addArtwork); // Adding artworks
+router.put('/updateByID', artworkController.updateArtwork); // Updating artwork
+router.delete('/deleteByID', artworkController.removeArtwork); // deleting artworks
 
-module.exports= router;
+module.exports = router;

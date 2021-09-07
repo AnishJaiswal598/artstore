@@ -1,112 +1,116 @@
-const Orders = require("../models/Orders")
+const Orders = require('../models/Orders');
 
 // list all the orders
-const index = async (req, res, send) => {
-    try {
-        const list = await Orders.find()
-        {
-            res.json({
-                message: "heres the list of all the orders",
-                list
-            })
-        }
-
-    } 
-    catch (error) {
-            res.json({
-                message: "an error occured",
-                error
-            })
-    }
-}
+const listAllOrders = async (req, res) => {
+  try {
+    const list = await Orders.find();
+    res.status(200).json({
+      success: true,
+      message: 'heres the list of all the orders',
+      list,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // call the orders by id
 
-const show = async (req, res, send) => {
-    try {
-        let OrderID = req.body.OrderID
-        const This = await Orders.findById(OrderID)
-        {
-            res.json({
-                message: "The order of given id is given below",
-                This
-            })
-        }
-    } 
-    catch (error) {
-            res.json({
-                message: "not able to find Order by its ID",
-                error
-            })
-    }
-}
+const orderByID = async (req, res) => {
+  try {
+    const orderID = req.body.orderID;
+    const showOrder = await Orders.findById(orderID);
+    res.status(200).json({
+      success: true,
+      message: 'The order of given id is given below',
+      showOrder,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // Adding an Order
-const store = async (req, res, send) => {
-    try {
-        let order = new Orders({
-            orderNo:req.body.orderNo,
-            artworkNo:req.body.artworkNo,
-            quantity:req.body.quantity
+const addOrder = async (req, res) => {
+  try {
+    const orderAdd = new Orders({
+      ...req.body,
+    });
+    const newOrder = await orderAdd.save();
+    res.status(201).json({
+      success: true,
+      message: 'new order added successfully',
+      newOrder,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-        })
-        const add = await order.save()
-        {
-            res.json({
-                message: "new order added successfully",
-                add
-            })
-        }
-    } 
-    catch (error) {
-            res.json({
-                message: "Not able to add order",
-                error
-            })
+// Updating an order by its ID
+
+const updateOrder = async (req, res) => {
+  try {
+    const orderID = req.body.orderID;
+    const updateData = {
+      ...req.body,
+    };
+    const found = await Orders.findByIdAndUpdate(
+      orderID,
+      { $set: updateData },
+      { omitUndefined: 1 }
+    );
+    if (!found) {
+      res.status(404).json({
+        success: false,
+        message: 'Orders not found',
+      });
+    } else {
+      res.status(201).json({
+        success: true,
+        message: 'Order updated sucessfully',
+        updateData,
+      });
     }
-}
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-//Updating an order by its ID
+// Deleting an Order by its ID
 
-const changes = async (req, res, send) => {
-    try {
-        let OrderID = req.body.OrderID
-        let updateData = {
-            orderNo:req.body.orderNo,
-            artworkNo:req.body.artworkNo,
-            quantity:req.body.quantity
-        }
-        const update = await Orders.findByIdAndUpdate(OrderID, { $set: updateData })
-            res.json({
-                message: "Order updated sucessfully",
-                update
-            })
-    } 
-    catch (error) {
-            res.json({
-                message: "Order was not been able to get updated",
-                error
-        })
-    }
-}
+const removeOrder = async (req, res) => {
+  try {
+    const orderID = req.body.orderID;
+    await Orders.findByIdAndDelete(orderID);
+    res.status(200).json({
+      success: true,
+      message: 'Order removed successfully',
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-//Deleting an Order by its ID
-
-const remove = async (req, res, send) => {
-    try {
-        let OrderID = req.body.OrderID
-        await Orders.findByIdAndDelete(OrderID)
-        {
-            res.json({
-                message: "Order removed successfully"
-            })
-        }
-    } 
-    catch (error) {
-            res.json({
-                message: "error occured removing Order"
-            })
-    }
-}
-
-module.exports = { index, show, store, changes, remove }
+module.exports = {
+  listAllOrders,
+  orderByID,
+  addOrder,
+  updateOrder,
+  removeOrder,
+};

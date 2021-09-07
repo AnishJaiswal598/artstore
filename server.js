@@ -1,35 +1,25 @@
-const express = require('express')
-const mongoose = require ('mongoose')
-const morgan = require('morgan')
-require('dotenv').config()
+require('dotenv').config();
 
-const artworkRoute = require('./routes/artworks')
-const ordersRoute = require('./routes/orders')
-const usersRoute = require('./routes/users')
+const express = require('express');
+const morgan = require('morgan');
+const connectDB = require('./config/db');
 
-mongoose.connect(process.env.URL, { useNewUrlParser: true, useUnifiedTopology: true,
-useCreateIndex: true });
-const db = mongoose.connection;
-    db.on('error', (error)=>{
-        console.log(error)//ask
-    });
-    db.once('open', ()=> {
-        console.log("Database connection established")
-    });
-const app= express()
-    app.use(express.urlencoded({extended:true}))//ask
-    app.use(express.json())//ask
+const artworkRoute = require('./routes/artworks');
+const ordersRoute = require('./routes/orders');
+const usersRoute = require('./routes/Users');
 
-    const PORT = process.env.PORT || 3000;
+connectDB();
+const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(morgan(':method :url :status :response-time ms'));
 
-    app.listen(PORT, ()=>{
-        console.log(`Server is running on port ${PORT}`)
+app.use('/api/artstore/artworks', artworkRoute);
+app.use('/api/artstore/orders', ordersRoute);
+app.use('/api/artstore/users', usersRoute);
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
-    //  CUSTOM TOKENS
-    morgan.token('body', (req) => JSON.stringify(req.body));
-
-    // app.use(morgan('tiny'))
-    app.use(morgan(`:url :method :body`))//Asking for specific things
-    app.use('/api/artstore/artwork',artworkRoute);
-    app.use('/api/artstore/Orders',ordersRoute)
-    app.use('/api/artstore/Users',usersRoute)

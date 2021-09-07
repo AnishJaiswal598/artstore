@@ -1,117 +1,116 @@
-const { ServerDescription } = require("mongodb")
-const { findByIdAndRemove } = require("../models/Artworks")
-const Artwork = require("../models/Artworks")
+const Artwork = require('../models/Artworks');
 
 // list all the artworks
-const index = async(req,res,send)=>{
-    try {
-        const list = await Artwork.find()
-     {
-             res.json({
-                message:"heres the list of all the artworks",
-                list,
-                
-            })
-     }
-     
-    } 
-    catch (error) {
-            res.json({
-                message:"an error occured",
-                error
-            })
-    }
-}
+const listAllArtworks = async (req, res) => {
+  try {
+    const list = await Artwork.find();
+    res.status(200).json({
+      success: true,
+      message: 'heres the list of all the artworks',
+      list,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // call the artwork by id
 
-const show = async(req,res,send)=>{
-    try {
-        let ArtworkID = req.body.ArtworkID
-        const This = await Artwork.findById(ArtworkID)
-        {
-            res.json({
-                message:"The artwork of given id is given below",
-                This
-            })
-        }
-    } 
-    catch (error) {
-            res.json({
-                message:"not able to find Artwork by its ID",
-                error
-            })
-    }
-}
+const artworkbyID = async (req, res) => {
+  try {
+    const artworkID = req.body.artworkID;
+    const showArtwork = await Artwork.findById(artworkID);
+    res.status(200).json({
+      success: true,
+      message: 'The artwork of given id is given below',
+      showArtwork,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // ADDING AN ARTWORK
-const store = async(req,res,send)=>{
-    try {
-        let artwork = new Artwork({
-     Image:req.body.Image,
-     description:req.body.description,
-     price:req.body.price,
-     features:req.body.features
-        })
-        const navin =await artwork.save()
-        {
-            res.json({
-                message:"new artwork added successfully",
-                navin
-            })
-        }
-    } 
-    catch (error) {
-            res.json({
-                message:"Not able to add artwork",
-                error
-            })
-    }
-}
+const addArtwork = async (req, res) => {
+  try {
+    const artworkAdd = new Artwork({
+      ...req.body,
+    });
+    const newArtwork = await artworkAdd.save();
+    res.status(201).json({
+      success: true,
+      message: 'new artwork added successfully',
+      newArtwork,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-//Updating an artwork by its ID
+// Updating an artwork by its ID
 
-const changes = async(req,res,send)=>{
-    try {
-    let ArtworkID = req.body.ArtworkID
-    let updateData={
-    Image:req.body.Image,
-     description:req.body.description,
-     price:req.body.price,
-     features:req.body.features
+const updateArtwork = async (req, res) => {
+  try {
+    const artworkID = req.body.artworkID;
+    const updateData = {
+      ...req.body,
+    };
+    const found = await Artwork.findByIdAndUpdate(
+      artworkID,
+      { $set: updateData },
+      { omitUndefined: 1 }
+    );
+    if (!found) {
+      res.status(404).json({
+        success: false,
+        message: 'Artwork not found',
+      });
+    } else {
+      res.status(201).json({
+        success: true,
+        message: 'Artwork updated sucessfully',
+        updateData,
+      });
     }
-    const update = await Artwork.findByIdAndUpdate(ArtworkID,{$set:updateData})
-            res.json({
-                message:"Artwork updated sucessfully",
-                update
-            })
-} 
-    catch (error) {
-            res.json({
-                message:"Artwork was not been able to get updated",
-                error
-            })
-}
-}
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 //Deleting an artwork by its ID
 
-const remove = async(req,res,send)=>{
-    try {
-        let ArtworkID=req.body.ArtworkID
-         await Artwork.findByIdAndDelete(ArtworkID)
-        {
-            res.json({
-                message:"Artwork removed successfully"
-            })
-        }
-    } 
-    catch (error) {
-            res.json({
-                message:"arror occured rmoving artwork",
-                error
-            })
-    }
-}
+const removeArtwork = async (req, res) => {
+  try {
+    const artworkID = req.body.artworkID;
+    await Artwork.findByIdAndDelete(artworkID);
+    res.status(200).json({
+      success: true,
+      message: 'Artwork removed successfully',
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
-module.exports={index,show,store,changes,remove};
+module.exports = {
+  listAllArtworks,
+  artworkbyID,
+  addArtwork,
+  updateArtwork,
+  removeArtwork,
+};

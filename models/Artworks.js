@@ -1,23 +1,30 @@
-const mongoose = require ("mongoose")
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
 
-const artworkSchema = new Schema({
-    Image:{},
-    description:{
-        type:String,
-        // required:true,
-        // unique:true
-    },
-    price:{
-        type:Number
-    },
-    features:{
-        type:String
-    },
+const Schema = mongoose.Schema;
 
+const artworkSchema = new Schema(
+  {
+    image: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    {timestamps:true})
+    price: {
+      type: Number,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    size: {
+      type: Array,
+      description: 'Enter length, breadth.',
+    },
+  },
+  { timestamps: true }
+);
 
-    const Artwork = mongoose.model('Artwork',artworkSchema)
+const artwork = mongoose.model('Artwork', artworkSchema);
 
-module.exports= Artwork;
+module.exports = artwork;
