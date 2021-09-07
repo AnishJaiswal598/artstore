@@ -1,12 +1,10 @@
 ---
 # Artstore- Unicode learnings
----
 
 ## Started development using NODE JS
 
 # Env variables
 
----
 
 Create a .env file in your root and add following:-
 
@@ -18,8 +16,7 @@ PORT=3000
 # Run
 
 ---
-
-# nodemon server.js
+ nodemon server.js
 
 # Routes
 
