@@ -1,4 +1,42 @@
+const bcrypt = require('bcryptjs');
 const Users = require('../models/Users');
+
+// sign Up AN User
+const signupUser = async (req, res) => {
+  try {
+    const userAdd = new Users({
+      ...req.body,
+    });
+    await userAdd.save();
+    const token = await userAdd.generateAuthToken();
+    res.status(201).json({
+      success: true,
+      message: 'new User added successfully',
+      userAdd,
+      token,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// logging in an user
+
+const userLogin = async (req, res) => {
+  try {
+    const user = await Users.findByCredentials(
+      req.body.email,
+      req.body.password
+    );
+    const token = await user.generateAuthToken();
+    res.send({ user, token });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+};
 
 // list all the Users
 const listAllUsers = async (req, res) => {
@@ -17,55 +55,19 @@ const listAllUsers = async (req, res) => {
   }
 };
 
-// call the user by id
-
-const userByID = async (req, res) => {
-  try {
-    const userID = req.body.userID;
-    const showUser = await Users.findById(userID);
-    res.status(200).json({
-      success: true,
-      message: 'The User of given id is given below',
-      showUser,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-// ADDING AN User
-const addUser = async (req, res) => {
-  try {
-    const userAdd = new Users({
-      ...req.body,
-    });
-    const newUser = await userAdd.save();
-    res.status(201).json({
-      success: true,
-      message: 'new User added successfully',
-      newUser,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-// Updating an User by its ID
+// Updating your ID
 
 const updateUser = async (req, res) => {
   try {
-    const userID = req.body.userID;
+    const user = Users.findById(req.user._id);
     const updateData = {
-      ...req.body,
+      age: req.body.age,
+      address: req.body.address,
+      email: req.body.email,
+      password: await bcrypt.hash(req.body.password, 8),
     };
-    const found = await Users.findByIdAndUpdate(
-      userID,
+    const found = await Users.updateOne(
+      user,
       { $set: updateData },
       { omitUndefined: 1 }
     );
@@ -89,15 +91,14 @@ const updateUser = async (req, res) => {
   }
 };
 
-// Deleting an User by its ID
+// Removing your account
 
-const removeUser = async (req, res) => {
+const removeMe = async (req, res) => {
   try {
-    const userID = req.body.userID;
-    await Users.findByIdAndDelete(userID);
+    const user = await Users.findByIdAndDelete(req.user._id);
     res.status(200).json({
       success: true,
-      message: 'Users removed successfully',
+      message: 'Successfully deleted your account',
     });
   } catch (error) {
     res.status(400).json({
@@ -107,4 +108,10 @@ const removeUser = async (req, res) => {
   }
 };
 
-module.exports = { listAllUsers, userByID, addUser, updateUser, removeUser };
+module.exports = {
+  signupUser,
+  userLogin,
+  listAllUsers,
+  updateUser,
+  removeMe,
+};

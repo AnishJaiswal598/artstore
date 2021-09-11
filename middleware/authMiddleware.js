@@ -4,10 +4,9 @@ const User = require('../models/Users');
 const protect = async (req, res, next) => {
   try {
     const token = req.header('Authorization').replace('Bearer ', '');
-    const decoded = jwt.verify(token, 'thisIsMyNewCourse');
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
     const user = await User.findOne({
       _id: decoded._id,
-      'tokens.token': token,
     });
 
     if (!user) {
@@ -16,6 +15,7 @@ const protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    console.log(error);
     res.status(401).send({ error: 'plz authenticate' });
   }
 };
@@ -25,7 +25,7 @@ const admin = (req, res, next) => {
     next();
   } else {
     res.status(401);
-    throw new Error('Not authorized as an admin');
+    throw new Error('You dont have required permissions');
   }
 };
 

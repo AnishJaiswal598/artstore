@@ -4,7 +4,6 @@
 
 # Env variables
 
-
 Create a .env file in your root and add following:-
 
 URL=your mongodb url
@@ -12,12 +11,10 @@ PORT=3000
 
 # Run
 
- nodemon server.js
+npm run dev
 
 # Routes
 
-
-  
 List all Users
 
 ![listAll](https://user-images.githubusercontent.com/80106144/132266813-fcadf947-2ccb-4eae-b542-c091e994e24f.jpeg)
@@ -39,6 +36,3 @@ Delete User
 ![delete](https://user-images.githubusercontent.com/80106144/132266909-c8cf65fa-e74e-4e3c-91d0-913c687394ac.jpeg)
 
 [Made simmilar routes for Artworks and Orders]
-
-
-

@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -19,7 +20,8 @@
     "mongodb": "^4.1.0",
     "mongoose": "^5.13.8",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "validator": "^13.6.0"
   },
   "devDependencies": {
     "eslint": "^6.0.0",

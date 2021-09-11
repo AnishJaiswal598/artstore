@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const Schema = mongoose.Schema;
 
@@ -10,11 +12,11 @@ const userSchema = new Schema(
       trim: true,
     },
     email: {
-      type: String,
+      type: Schema.Types.String,
+      unique: true,
       required: true,
       lowercase: true,
       trim: true,
-      unique: true,
     },
 
     age: {
@@ -29,12 +31,50 @@ const userSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      minlngth: 7,
+      minlength: 7,
+    },
+    isAdmin: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   { timestamps: true }
 );
 
-const user = mongoose.model('User', userSchema);
+userSchema.methods.generateAuthToken = async function () {
+  const user = this;
+  const token = jwt.sign({ _id: user._id.toString() }, process.env.SECRET_KEY);
+  await user.save();
 
-module.exports = user;
+  return token;
+};
+// login using hash
+userSchema.statics.findByCredentials = async (email, password) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new Error('Unable to login u');
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    throw new Error('Unable to login');
+  }
+
+  return user;
+};
+
+// hashing the plain text password
+userSchema.pre('save', async function (next) {
+  const user = this;
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+  next();
+});
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

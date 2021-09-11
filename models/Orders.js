@@ -11,18 +11,15 @@ const orderSchema = new Schema(
     },
     artworks: [
       {
-        artworkSelected: {
+        artworkRequired: {
           type: mongoose.Schema.Types.ObjectId,
           required: true,
-          ref: 'Artworks',
-        },
-        price: {
-          type: Number,
-          required: true,
+          ref: 'Artwork',
         },
         quantity: {
           type: Number,
           required: true,
+          default: 1,
         },
       },
     ],
@@ -37,6 +34,15 @@ const orderSchema = new Schema(
   },
   { timestamps: true }
 );
+
+orderSchema.path('artworks').validate(function (artworks) {
+  if (!artworks) {
+    return false;
+  } else if (artworks.length === 0) {
+    return false;
+  }
+  return true;
+}, 'Minimum One product required to Order');
 
 const order = mongoose.model('Order', orderSchema);
 
