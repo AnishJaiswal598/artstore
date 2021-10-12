@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const Users = require('../models/Users');
+const mail = require('../mailing/gmail');
 
 // sign Up AN User
 const signupUser = async (req, res) => {
@@ -8,6 +9,7 @@ const signupUser = async (req, res) => {
       ...req.body,
     });
     await userAdd.save();
+    await mail.userSignUp(req.body.email);
     const token = await userAdd.generateAuthToken();
     res.status(201).json({
       success: true,
@@ -61,11 +63,15 @@ const updateUser = async (req, res) => {
   try {
     const user = Users.findById(req.user._id);
     const updateData = {
-      age: req.body.age,
-      address: req.body.address,
-      email: req.body.email,
-      password: await bcrypt.hash(req.body.password, 8),
+      ...req.body,
+      password: req.body.password
+        ? await bcrypt.hash(req.body.password, 8)
+        : req.body.password,
     };
+
+    updateData.password
+      ? await mail.userPassword(req.user.email)
+      : await mail.userUpdate(req.user.email);
     const found = await Users.updateOne(
       user,
       { $set: updateData },
@@ -88,6 +94,7 @@ const updateUser = async (req, res) => {
       success: false,
       message: error.message,
     });
+    console.log(error);
   }
 };
 
