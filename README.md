@@ -44,5 +44,3 @@ Profile Image
 
 Artwork Image
 ![image](https://user-images.githubusercontent.com/80106144/137555538-152f26e0-f3e1-4d53-aa50-fbbad93b1953.png)
-
-

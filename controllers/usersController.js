@@ -1,12 +1,15 @@
 const bcrypt = require('bcryptjs');
 const Users = require('../models/Users');
 const mail = require('../mailing/gmail');
+const multer = require('multer');
+const path = require('path');
 
 // sign Up AN User
 const signupUser = async (req, res) => {
   try {
     const userAdd = new Users({
       ...req.body,
+      image: req.file.path,
     });
     await userAdd.save();
     await mail.userSignUp(req.body.email);
@@ -25,6 +28,54 @@ const signupUser = async (req, res) => {
   }
 };
 
+// Getting users profile pic
+const a = new Date();
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads/userProfile');
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname +
+        '-' +
+        a.getDate() +
+        '-' +
+        (a.getMonth() + 1) +
+        '-' +
+        a.getFullYear() +
+        '-' +
+        a.getHours() +
+        '.' +
+        a.getMinutes() +
+        '.' +
+        a.getSeconds() +
+        ' ' +
+        path.extname(file.originalname)
+    );
+  },
+});
+
+const uploadImg1 = multer({
+  storage: storage,
+  limits: { fileSize: 10000000 },
+  fileFilter: function (req, file, cb) {
+    checkFileType(file, cb);
+  },
+}).single('profileImage');
+
+function checkFileType(file, cb) {
+  const filetypes = /jpeg|jpg|png|gif/;
+  filetypes.test(path.extname(file.originalname).toLowerCase());
+
+  const mimetype = filetypes.test(file.mimetype);
+
+  if (filetypes && mimetype) {
+    return cb(null, true);
+  } else {
+    return cb('Error:Images only');
+  }
+}
 // logging in an user
 
 const userLogin = async (req, res) => {
@@ -64,6 +115,7 @@ const updateUser = async (req, res) => {
     const user = Users.findById(req.user._id);
     const updateData = {
       ...req.body,
+      image: req.file.path,
       password: req.body.password
         ? await bcrypt.hash(req.body.password, 8)
         : req.body.password,
@@ -117,6 +169,7 @@ const removeMe = async (req, res) => {
 
 module.exports = {
   signupUser,
+  uploadImg1,
   userLogin,
   listAllUsers,
   updateUser,

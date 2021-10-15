@@ -33,6 +33,10 @@ const userSchema = new Schema(
       trim: true,
       minlength: 7,
     },
+    image: {
+      type: String,
+      unique: true,
+    },
     isAdmin: {
       type: Boolean,
       required: true,

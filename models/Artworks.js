@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const artworkSchema = new Schema(
   {
-    image: {
+    artImage: {
       type: String,
       required: true,
       unique: true,

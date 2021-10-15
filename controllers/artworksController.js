@@ -1,4 +1,6 @@
 const Artwork = require('../models/Artworks');
+const multer = require('multer');
+const path = require('path');
 
 // list all the artworks
 const listAllArtworks = async (req, res) => {
@@ -41,6 +43,7 @@ const addArtwork = async (req, res) => {
   try {
     const artworkAdd = new Artwork({
       ...req.body,
+      artImage: req.file.path,
     });
     const newArtwork = await artworkAdd.save();
     res.status(201).json({
@@ -56,6 +59,55 @@ const addArtwork = async (req, res) => {
   }
 };
 
+// getting artworks image
+const a = new Date();
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads/Artworks');
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname +
+        '-' +
+        a.getDate() +
+        '-' +
+        (a.getMonth() + 1) +
+        '-' +
+        a.getFullYear() +
+        '-' +
+        a.getHours() +
+        '.' +
+        a.getMinutes() +
+        '.' +
+        a.getSeconds() +
+        ' ' +
+        path.extname(file.originalname)
+    );
+  },
+});
+
+const uploadImg = multer({
+  storage: storage,
+  limits: { fileSize: 10000000 },
+  fileFilter: function (req, file, cb) {
+    checkFileType(file, cb);
+  },
+}).single('artImage');
+
+function checkFileType(file, cb) {
+  const filetypes = /jpeg|jpg|png|gif/;
+  filetypes.test(path.extname(file.originalname).toLowerCase());
+
+  const mimetype = filetypes.test(file.mimetype);
+
+  if (filetypes && mimetype) {
+    return cb(null, true);
+  } else {
+    return cb('Error:Images only');
+  }
+}
+
 // Updating an artwork by its ID
 
 const updateArtwork = async (req, res) => {
@@ -63,6 +115,7 @@ const updateArtwork = async (req, res) => {
     const artworkID = req.body.artworkID;
     const updateData = {
       ...req.body,
+      image: req.file.path,
     };
     const found = await Artwork.findByIdAndUpdate(
       artworkID,
@@ -111,6 +164,7 @@ module.exports = {
   listAllArtworks,
   artworkbyID,
   addArtwork,
+  uploadImg,
   updateArtwork,
   removeArtwork,
 };
