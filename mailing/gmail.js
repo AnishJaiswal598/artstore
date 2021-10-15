@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -57,4 +57,4 @@ const userPassword = async (email) => {
   });
 };
 
-module.exports = { userSignUp, userUpdate, userPassword };
+export { userSignUp, userUpdate, userPassword };

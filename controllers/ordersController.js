@@ -1,4 +1,4 @@
-const Orders = require('../models/Orders');
+import Orders from '../models/Orders.js';
 
 // list all the orders
 const listAllOrders = async (req, res) => {
@@ -107,10 +107,4 @@ const removeOrder = async (req, res) => {
   }
 };
 
-module.exports = {
-  listAllOrders,
-  orderByID,
-  addOrder,
-  updateOrder,
-  removeOrder,
-};
+export { listAllOrders, orderByID, addOrder, updateOrder, removeOrder };

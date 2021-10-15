@@ -1,17 +1,20 @@
-const express = require('express');
+import express from 'express';
+import {
+  signupUser,
+  uploadImg1,
+  userLogin,
+  listAllUsers,
+  updateUser,
+  removeMe,
+} from '../controllers/usersController.js';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
-const userController = require('../controllers/usersController');
-const auth = require('../middleware/authMiddleware');
 
-router.post('/register', userController.uploadImg1, userController.signupUser); // register users
-router.post('/login', userController.userLogin); // logging users
-router.get('/listAll', auth.protect, auth.admin, userController.listAllUsers); // listing all users by admin
-router.put(
-  '/update',
-  auth.protect,
-  userController.uploadImg1,
-  userController.updateUser
-); // updating myself
-router.delete('/delete', auth.protect, userController.removeMe); // deleting myself
-module.exports = router;
+router.post('/register', uploadImg1, signupUser); // register users
+router.post('/login', userLogin); // logging users
+router.get('/listAll', protect, admin, listAllUsers); // listing all users by admin
+router.put('/update', protect, uploadImg1, updateUser); // updating myself
+router.delete('/delete', protect, removeMe); // deleting myself
+
+export default router;

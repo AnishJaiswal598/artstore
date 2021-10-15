@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
@@ -46,4 +46,4 @@ orderSchema.path('artworks').validate(function (artworks) {
 
 const order = mongoose.model('Order', orderSchema);
 
-module.exports = order;
+export default order;

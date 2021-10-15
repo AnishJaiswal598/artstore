@@ -1,8 +1,8 @@
-const bcrypt = require('bcryptjs');
-const Users = require('../models/Users');
-const mail = require('../mailing/gmail');
-const multer = require('multer');
-const path = require('path');
+import bcrypt from 'bcryptjs';
+import multer from 'multer';
+import path from 'path';
+import Users from '../models/Users.js';
+import { userSignUp, userUpdate, userPassword } from '../mailing/gmail.js';
 
 // sign Up AN User
 const signupUser = async (req, res) => {
@@ -12,7 +12,7 @@ const signupUser = async (req, res) => {
       image: req.file.path,
     });
     await userAdd.save();
-    await mail.userSignUp(req.body.email);
+    await userSignUp(req.body.email);
     const token = await userAdd.generateAuthToken();
     res.status(201).json({
       success: true,
@@ -40,8 +40,7 @@ const storage = multer.diskStorage({
       file.fieldname +
         '-' +
         a.getDate() +
-        '-' +
-        (a.getMonth() + 1) +
+        import(a.getMonth() + 1) +
         '-' +
         a.getFullYear() +
         '-' +
@@ -122,8 +121,8 @@ const updateUser = async (req, res) => {
     };
 
     updateData.password
-      ? await mail.userPassword(req.user.email)
-      : await mail.userUpdate(req.user.email);
+      ? await userPassword(req.user.email)
+      : await userUpdate(req.user.email);
     const found = await Users.updateOne(
       user,
       { $set: updateData },
@@ -167,7 +166,7 @@ const removeMe = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   signupUser,
   uploadImg1,
   userLogin,

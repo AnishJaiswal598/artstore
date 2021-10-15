@@ -1,13 +1,13 @@
-require('dotenv').config();
+import express from 'express';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+import connectDB from './config/db.js';
 
-const express = require('express');
-const morgan = require('morgan');
-const connectDB = require('./config/db');
+import artworkRoute from './routes/artworks.js';
+import ordersRoute from './routes/orders.js';
+import usersRoute from './routes/Users.js';
 
-const artworkRoute = require('./routes/artworks');
-const ordersRoute = require('./routes/orders');
-const usersRoute = require('./routes/Users');
-
+dotenv.config();
 connectDB();
 const app = express();
 app.use(express.urlencoded({ extended: true }));

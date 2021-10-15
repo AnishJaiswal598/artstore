@@ -1,13 +1,19 @@
-const express = require('express');
+import express from 'express';
+import {
+  listAllOrders,
+  orderByID,
+  addOrder,
+  updateOrder,
+  removeOrder,
+} from '../controllers/ordersController.js';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
-const orderController = require('../controllers/ordersController');
-const auth = require('../middleware/authMiddleware');
 
-router.get('/listAll', auth.protect, auth.admin, orderController.listAllOrders); // list of orders to admin
-router.get('/showByID', orderController.orderByID); // listing order by id
-router.post('/add', auth.protect, orderController.addOrder); // adding orders by user
-router.put('/update', auth.protect, orderController.updateOrder); // updating orders by user
-router.delete('/delete', auth.protect, orderController.removeOrder); // deleting orders by user
+router.get('/listAll', protect, admin, listAllOrders); // list of orders to admin
+router.get('/showByID', orderByID); // listing order by id
+router.post('/add', protect, addOrder); // adding orders by user
+router.put('/update', protect, updateOrder); // updating orders by user
+router.delete('/delete', protect, removeOrder); // deleting orders by user
 
-module.exports = router;
+export default router;

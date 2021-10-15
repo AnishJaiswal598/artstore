@@ -1,6 +1,6 @@
-const Artwork = require('../models/Artworks');
-const multer = require('multer');
-const path = require('path');
+import multer from 'multer';
+import path from 'path';
+import Artwork from '../models/Artworks.js';
 
 // list all the artworks
 const listAllArtworks = async (req, res) => {
@@ -160,7 +160,7 @@ const removeArtwork = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   listAllArtworks,
   artworkbyID,
   addArtwork,
