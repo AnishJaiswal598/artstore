@@ -37,7 +37,7 @@ Delete User
 
 [Made simmilar routes for Artworks and Orders]
 
-#Image uploading and mail sendings
+# Image uploading and mail sendings
 
 Profile Image
 ![image](https://user-images.githubusercontent.com/80106144/137555480-b2654cf5-6a7c-49b8-86e3-c94c747fe001.png)
