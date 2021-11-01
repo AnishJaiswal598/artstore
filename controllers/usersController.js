@@ -5,28 +5,6 @@ import Users from '../models/Users.js';
 import { userSignUp, userUpdate, userPassword } from '../mailing/gmail.js';
 
 // sign Up AN User
-const signupUser = async (req, res) => {
-  try {
-    const userAdd = new Users({
-      ...req.body,
-      image: req.file.path,
-    });
-    await userAdd.save();
-    await userSignUp(req.body.email);
-    const token = await userAdd.generateAuthToken();
-    res.status(201).json({
-      success: true,
-      message: 'new User added successfully',
-      userAdd,
-      token,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
 
 // Getting users profile pic
 const a = new Date();
@@ -75,6 +53,44 @@ function checkFileType(file, cb) {
     return cb('Error:Images only');
   }
 }
+const signupUser = async (req, res) => {
+  try {
+    if (req.file) {
+      const userAdd = new Users({
+        ...req.body,
+        image: req.file.path,
+      });
+      await userAdd.save();
+      await userSignUp(req.body.email);
+      const token = await userAdd.generateAuthToken();
+      res.status(201).json({
+        success: true,
+        message: 'new User added successfully',
+        userAdd,
+        token,
+      });
+    } else {
+      const userAdd = new Users({
+        ...req.body,
+      });
+
+      await userAdd.save();
+      await userSignUp(req.body.email);
+      const token = await userAdd.generateAuthToken();
+      res.status(201).json({
+        success: true,
+        message: 'new User added successfully',
+        userAdd,
+        token,
+      });
+    }
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 // logging in an user
 
 const userLogin = async (req, res) => {
@@ -114,7 +130,7 @@ const updateUser = async (req, res) => {
     const user = Users.findById(req.user._id);
     const updateData = {
       ...req.body,
-      image: req.file.path,
+      // image: req.file.path,
       password: req.body.password
         ? await bcrypt.hash(req.body.password, 8)
         : req.body.password,

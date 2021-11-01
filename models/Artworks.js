@@ -7,7 +7,6 @@ const artworkSchema = new Schema(
     artImage: {
       type: String,
       required: true,
-      unique: true,
     },
     price: {
       type: Number,

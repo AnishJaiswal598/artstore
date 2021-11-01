@@ -8,7 +8,7 @@ import ordersRoute from './routes/orders.js';
 import usersRoute from './routes/Users.js';
 
 dotenv.config();
-connectDB();
+await connectDB();
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -23,3 +23,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+export default app;

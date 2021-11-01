@@ -115,7 +115,7 @@ const updateArtwork = async (req, res) => {
     const artworkID = req.body.artworkID;
     const updateData = {
       ...req.body,
-      image: req.file.path,
+      // image: req.file.path,
     };
     const found = await Artwork.findByIdAndUpdate(
       artworkID,
