@@ -7,7 +7,6 @@ const addOrder = async (req, res) => {
       ...req.body,
       orderPlacer: req.user._id,
     });
-    console.log(orderAdd);
     const newOrder = await orderAdd.save();
     res.status(201).json({
       success: true,
@@ -45,7 +44,6 @@ const orderByID = async (req, res) => {
 const updateOrder = async (req, res) => {
   try {
     const orderID = req.params.id;
-    console.log(orderID);
     const found = await Orders.findOne({
       _id: orderID,
       orderPlacer: req.user._id,
@@ -53,7 +51,6 @@ const updateOrder = async (req, res) => {
     const updateData = {
       ...req.body,
     };
-    console.log(updateData);
     await found.updateOne({ $set: updateData }, { omitUndefined: 1 });
     if (!found) {
       return res.status(404).json({

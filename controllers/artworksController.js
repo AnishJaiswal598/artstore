@@ -41,16 +41,28 @@ const artworkbyID = async (req, res) => {
 // ADDING AN ARTWORK
 const addArtwork = async (req, res) => {
   try {
-    const artworkAdd = new Artwork({
-      ...req.body,
-      artImage: req.file.path,
-    });
-    const newArtwork = await artworkAdd.save();
-    res.status(201).json({
-      success: true,
-      message: 'new artwork added successfully',
-      newArtwork,
-    });
+    if (req.file) {
+      const artworkAdd = new Artwork({
+        ...req.body,
+        artImage: req.file.path,
+      });
+      const newArtwork = await artworkAdd.save();
+      res.status(201).json({
+        success: true,
+        message: 'new artwork added successfully',
+        newArtwork,
+      });
+    } else {
+      const artworkAdd = new Artwork({
+        ...req.body,
+      });
+      const newArtwork = await artworkAdd.save();
+      res.status(201).json({
+        success: true,
+        message: 'new artwork added successfully',
+        newArtwork,
+      });
+    }
   } catch (error) {
     res.status(400).json({
       success: false,

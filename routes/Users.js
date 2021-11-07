@@ -3,7 +3,7 @@ import {
   signupUser,
   uploadImg1,
   userLogin,
-  listAllUsers,
+  showMyProfile,
   updateUser,
   removeMe,
 } from '../controllers/usersController.js';
@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post('/register', uploadImg1, signupUser); // register users
 router.post('/login', userLogin); // logging users
-router.get('/listAll', protect, admin, listAllUsers); // listing all users by admin
+router.get('/showMe', protect, showMyProfile); // Show my profile
 router.put('/update', protect, uploadImg1, updateUser); // updating myself
 router.delete('/delete', protect, removeMe); // deleting myself
 

@@ -106,14 +106,14 @@ const userLogin = async (req, res) => {
   }
 };
 
-// list all the Users
-const listAllUsers = async (req, res) => {
+// getting profile
+const showMyProfile = async (req, res) => {
   try {
-    const list = await Users.find();
+    const profile = await req.user;
     res.status(200).json({
       success: true,
-      message: 'heres the list of all the Users',
-      list,
+      message: 'heres your profile',
+      profile,
     });
   } catch (error) {
     res.status(400).json({
@@ -186,7 +186,7 @@ export {
   signupUser,
   uploadImg1,
   userLogin,
-  listAllUsers,
+  showMyProfile,
   updateUser,
   removeMe,
 };
