@@ -3,6 +3,7 @@ import {
   signupUser,
   uploadImg1,
   userLogin,
+  logoutUser,
   showMyProfile,
   updateUser,
   removeMe,
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.post('/register', uploadImg1, signupUser); // register users
 router.post('/login', userLogin); // logging users
+router.post('/logout', protect, logoutUser) //logout user
 router.get('/showMe', protect, showMyProfile); // Show my profile
 router.put('/update', protect, uploadImg1, updateUser); // updating myself
 router.delete('/delete', protect, removeMe); // deleting myself
