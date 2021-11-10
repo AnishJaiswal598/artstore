@@ -106,6 +106,24 @@ const userLogin = async (req, res) => {
   }
 };
 
+//logout user
+const logoutUser = async(req, res) => {
+  try{
+    req.tokens === ''
+
+    res.json({
+      success: true, 
+      message: 'Logged out successfully'
+    })
+  } catch(e) {
+    console.log(e)
+    res.status(500).json({
+      success: false,
+      message: e.message
+    })
+  }
+}
+
 // getting profile
 const showMyProfile = async (req, res) => {
   try {
@@ -186,6 +204,7 @@ export {
   signupUser,
   uploadImg1,
   userLogin,
+  logoutUser,
   showMyProfile,
   updateUser,
   removeMe,

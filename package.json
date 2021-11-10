@@ -7,7 +7,7 @@
   "scripts": {
     "start": "nodemon server.js",
     "dev": "env-cmd ./.env nodemon ./server.js",
-    "test": "  mocha "
+    "test": "mocha "
   },
   "keywords": [],
   "author": "",
