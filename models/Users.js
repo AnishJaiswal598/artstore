@@ -8,12 +8,10 @@ const userSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
       trim: true,
     },
     email: {
       type: Schema.Types.String,
-      unique: true,
       required: true,
       lowercase: true,
       trim: true,
@@ -25,7 +23,6 @@ const userSchema = new Schema(
     },
     address: {
       type: String,
-      required: true,
     },
     password: {
       type: String,
@@ -38,7 +35,6 @@ const userSchema = new Schema(
     },
     isAdmin: {
       type: Boolean,
-      required: true,
       default: false,
     },
   },
@@ -47,7 +43,9 @@ const userSchema = new Schema(
 
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, process.env.SECRET_KEY);
+  const token = jwt.sign({ _id: user._id.toString() }, process.env.SECRET_KEY, {
+    expiresIn: '7d',
+  });
   await user.save();
 
   return token;

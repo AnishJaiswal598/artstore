@@ -1,4 +1,7 @@
 import nodemailer from 'nodemailer';
+import fs from 'fs';
+import ejs from 'ejs';
+import juice from 'juice';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -9,54 +12,80 @@ let transporter = nodemailer.createTransport({
     pass: process.env.PASSWORD,
   },
 });
-const userSignUp = async (email) => {
-  let mailOptions = {
-    from: process.env.EMAIL,
-    to: email,
-    subject: "Anish's Artstore",
-    text: 'Welcome to the best Artstore!!!',
+
+const userSignUp = async ({
+  template: templateName,
+  templateVars,
+  ...restOfOptions
+}) => {
+  const templatePath = `mailing/templates/${templateName}.html`;
+  const options = {
+    ...restOfOptions,
   };
 
-  transporter.sendMail(mailOptions, function (error, data) {
-    if (error) {
-      console.log('error occured:', error);
-    } else {
-      console.log('signup email sent');
-    }
-  });
+  if (templateName && fs.existsSync(templatePath)) {
+    const template = fs.readFileSync(templatePath, 'utf-8');
+    const html = ejs.render(template, templateVars);
+    const htmlWithStylesInlined = juice(html);
+    options.html = htmlWithStylesInlined;
+  }
+  return transporter.sendMail(options);
 };
 
-const userUpdate = async (email) => {
-  let mailOptions = {
-    from: process.env.EMAIL,
-    to: email,
-    subject: "Account details modified: Anish's Artstore",
-    text: 'Your account is successfully modified',
+const userUpdate = async ({
+  template: templateName,
+  templateVars,
+  ...restOfOptions
+}) => {
+  const templatePath = `mailing/templates/${templateName}.html`;
+  const options = {
+    ...restOfOptions,
   };
 
-  transporter.sendMail(mailOptions, function (error, data) {
-    if (error) {
-      console.log('error occured:', error);
-    } else {
-      console.log('user update mail sent');
-    }
-  });
+  if (templateName && fs.existsSync(templatePath)) {
+    const template = fs.readFileSync(templatePath, 'utf-8');
+    const html = ejs.render(template, templateVars);
+    const htmlWithStylesInlined = juice(html);
+    options.html = htmlWithStylesInlined;
+  }
+  return transporter.sendMail(options);
 };
-const userPassword = async (email) => {
-  let mailOptions = {
-    from: process.env.EMAIL,
-    to: email,
-    subject: "Password updated: Anish's artstore",
-    text: 'Your account password was successfully modified ',
+const userPassword = async ({
+  template: templateName,
+  templateVars,
+  ...restOfOptions
+}) => {
+  const templatePath = `mailing/templates/${templateName}.html`;
+  const options = {
+    ...restOfOptions,
   };
 
-  transporter.sendMail(mailOptions, function (error, data) {
-    if (error) {
-      console.log('error occured:', error);
-    } else {
-      console.log('Password reset mail sent');
-    }
-  });
+  if (templateName && fs.existsSync(templatePath)) {
+    const template = fs.readFileSync(templatePath, 'utf-8');
+    const html = ejs.render(template, templateVars);
+    const htmlWithStylesInlined = juice(html);
+    options.html = htmlWithStylesInlined;
+  }
+  return transporter.sendMail(options);
 };
 
-export { userSignUp, userUpdate, userPassword };
+const userPasswordReset = async ({
+  template: templateName,
+  templateVars,
+  ...restOfOptions
+}) => {
+  const templatePath = `mailing/templates/${templateName}.html`;
+  const options = {
+    ...restOfOptions,
+  };
+
+  if (templateName && fs.existsSync(templatePath)) {
+    const template = fs.readFileSync(templatePath, 'utf-8');
+    const html = ejs.render(template, templateVars);
+    const htmlWithStylesInlined = juice(html);
+    options.html = htmlWithStylesInlined;
+  }
+  return transporter.sendMail(options);
+};
+
+export { userSignUp, userUpdate, userPassword, userPasswordReset };

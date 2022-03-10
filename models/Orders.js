@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import Artwork from './Artworks.js';
+import User from './Users.js';
 
 const Schema = mongoose.Schema;
 

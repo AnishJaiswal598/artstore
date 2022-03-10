@@ -18,7 +18,11 @@ app.use('/api/artstore/artworks', artworkRoute);
 app.use('/api/artstore/orders', ordersRoute);
 app.use('/api/artstore/users', usersRoute);
 
-const PORT = process.env.PORT || 3000;
+app.get('/', (req, res) => {
+  res.send('okay');
+});
+
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
