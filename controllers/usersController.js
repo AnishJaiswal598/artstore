@@ -3,7 +3,6 @@ import multer from 'multer';
 import path from 'path';
 import lodash from 'lodash';
 import otpGenerator from 'otp-generator';
-
 import Users from '../models/Users.js';
 import Otp from '../models/otpModel.js';
 
@@ -12,6 +11,7 @@ import {
   userUpdate,
   userPassword,
   userPasswordReset,
+  otpSend,
 } from '../mailing/gmail.js';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
@@ -132,6 +132,16 @@ const signupUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     otp.otp = await bcrypt.hash(otp.otp, salt);
     const result = await otp.save();
+    await otpSend({
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Anish's Artstore",
+      template: 'otp',
+      templateVars: {
+        emailAddress: req.body.email,
+        otp: OTP,
+      },
+    });
     res.status(200).send({
       success: true,
       message: 'OTP sent successfully to your registered email-Id',
@@ -145,7 +155,6 @@ const signupUser = async (req, res) => {
 };
 
 const verifyOtp = async (req, res) => {
-  console.log(signupPassword);
   const pass = signupPassword;
   try {
     const email = req.body.email;
@@ -166,10 +175,30 @@ const verifyOtp = async (req, res) => {
     if (rightOtpfind.email == req.body.email && validUser) {
       const user = new Users({ email: email, password: pass });
       await user.save();
+      await userSignUp({
+        from: process.env.EMAIL,
+        to: req.body.email,
+        subject: "Anish's Artstore",
+        template: 'signUp',
+        templateVars: {
+          emailAddress: req.body.email,
+          name: req.body.name,
+        },
+      });
       const token = await user.generateAuthToken();
+      const deleteOtp = await Otp.deleteMany({
+        email: rightOtpfind.email,
+      });
       res.status(200).send({
         success: true,
         message: 'New User created successfully',
+        user,
+        token,
+      });
+    } else {
+      res.status(400).send({
+        success: false,
+        message: 'Plz enter the correct OTP',
       });
     }
   } catch (error) {

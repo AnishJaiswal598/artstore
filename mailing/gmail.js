@@ -32,6 +32,25 @@ const userSignUp = async ({
   return transporter.sendMail(options);
 };
 
+const otpSend = async ({
+  template: templateName,
+  templateVars,
+  ...restOfOptions
+}) => {
+  const templatePath = `mailing/templates/${templateName}.html`;
+  const options = {
+    ...restOfOptions,
+  };
+
+  if (templateName && fs.existsSync(templatePath)) {
+    const template = fs.readFileSync(templatePath, 'utf-8');
+    const html = ejs.render(template, templateVars);
+    const htmlWithStylesInlined = juice(html);
+    options.html = htmlWithStylesInlined;
+  }
+  return transporter.sendMail(options);
+};
+
 const userUpdate = async ({
   template: templateName,
   templateVars,
@@ -88,4 +107,4 @@ const userPasswordReset = async ({
   return transporter.sendMail(options);
 };
 
-export { userSignUp, userUpdate, userPassword, userPasswordReset };
+export { userSignUp, userUpdate, userPassword, userPasswordReset, otpSend };
