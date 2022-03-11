@@ -107,13 +107,13 @@ function checkFileType(file, cb) {
 //     });
 //   }
 // };
-
+let signpuEmail;
 let signupPassword;
 const signupUser = async (req, res) => {
   signupPassword = req.body.password;
-  const email = req.body.email;
+  signpuEmail = req.body.email;
   try {
-    const userAdd = await Users.findOne({ email: email });
+    const userAdd = await Users.findOne({ email: signpuEmail });
     if (userAdd) {
       res.status(400).json({
         success: false,
@@ -128,18 +128,20 @@ const signupUser = async (req, res) => {
       specialChars: false,
     });
     console.log(OTP);
-    const otp = new Otp({ email: req.body.email, otp: OTP });
+    const otp = new Otp({ email: signpuEmail, otp: OTP });
+    console.log(otp);
     const salt = await bcrypt.genSalt(10);
     otp.otp = await bcrypt.hash(otp.otp, salt);
     const result = await otp.save();
     await otpSend({
       from: process.env.EMAIL,
-      to: email,
+      to: signpuEmail,
       subject: "Anish's Artstore",
       template: 'otp',
       templateVars: {
-        emailAddress: req.body.email,
+        emailAddress: signpuEmail,
         otp: OTP,
+        resetLink
       },
     });
     res.status(200).send({
@@ -147,6 +149,7 @@ const signupUser = async (req, res) => {
       message: 'OTP sent successfully to your registered email-Id',
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json({
       success: false,
       message: error.message,
@@ -157,7 +160,7 @@ const signupUser = async (req, res) => {
 const verifyOtp = async (req, res) => {
   const pass = signupPassword;
   try {
-    const email = req.body.email;
+    const email = signpuEmail;
     const otp = req.body.otp;
     const otpHolder = await Otp.find({
       email: email,
@@ -170,9 +173,8 @@ const verifyOtp = async (req, res) => {
       return;
     }
     const rightOtpfind = otpHolder[otpHolder.length - 1];
-    console.log(pass);
     const validUser = await bcrypt.compare(otp, rightOtpfind.otp);
-    if (rightOtpfind.email == req.body.email && validUser) {
+    if (rightOtpfind.email == signpuEmail && validUser) {
       const user = new Users({ email: email, password: pass });
       await user.save();
       await userSignUp({
@@ -181,8 +183,9 @@ const verifyOtp = async (req, res) => {
         subject: "Anish's Artstore",
         template: 'signUp',
         templateVars: {
-          emailAddress: req.body.email,
+          emailAddress: email,
           name: req.body.name,
+          resetLink
         },
       });
       const token = await user.generateAuthToken();
