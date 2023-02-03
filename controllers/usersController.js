@@ -1,23 +1,26 @@
 import bcrypt from 'bcryptjs';
 import multer from 'multer';
 import path from 'path';
-import lodash from 'lodash';
 import otpGenerator from 'otp-generator';
 import Users from '../models/Users.js';
 import Otp from '../models/otpModel.js';
 
-import {
-  userSignUp,
-  userUpdate,
-  userPassword,
-  userPasswordReset,
-  otpSend,
-} from '../mailing/gmail.js';
+// import {
+//   userSignUp,
+//   userUpdate,
+//   userPassword,
+//   userPasswordReset,
+//   otpSend,
+// } from '../mailing/gmail.js';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import User from '../models/Users.js';
 dotenv.config();
-let resetLink = 'https://google.com';
+
+const TWILIO_ACCOUNT_SID = 'ACc7cc01564b9e373541ada52fc1a40d97';
+const TWILIO_AUTH_TOKEN = '58cd320713f6bd84885499da0d6e8fd5';
+const TWILIO_SERVICE_ID = 'VAe4a525ad3c199ce354e732f1e422c48b';
+import twilio from 'twilio';
+const client = new twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
 // sign Up AN User
 
@@ -108,107 +111,61 @@ function checkFileType(file, cb) {
 //   }
 // };
 
-let signupPassword;
-const signupUser = async (req, res) => {
-  signupPassword = req.body.password;
-  const email = req.body.email;
-  try {
-    const userAdd = await Users.findOne({ email: email });
-    if (userAdd) {
-      res.status(400).json({
-        success: false,
-        message: 'User already registered,Try Signing In',
-      });
-      return;
-    }
-    const OTP = otpGenerator.generate(6, {
-      digits: true,
-      lowerCaseAlphabets: false,
-      upperCaseAlphabets: false,
-      specialChars: false,
-    });
-    console.log(OTP);
-    const otp = new Otp({ email: req.body.email, otp: OTP });
-    const salt = await bcrypt.genSalt(10);
-    otp.otp = await bcrypt.hash(otp.otp, salt);
-    const result = await otp.save();
-    await otpSend({
-      from: process.env.EMAIL,
-      to: email,
-      subject: "Anish's Artstore",
-      template: 'otp',
-      templateVars: {
-        emailAddress: req.body.email,
-        otp: OTP,
-      },
-    });
-    res.status(200).send({
-      success: true,
-      message: 'OTP sent successfully to your registered email-Id',
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-const verifyOtp = async (req, res) => {
-  const pass = signupPassword;
-  try {
-    const email = req.body.email;
-    const otp = req.body.otp;
-    const otpHolder = await Otp.find({
-      email: email,
-    });
-    if (otpHolder.length === 0) {
-      res.status(400).send({
-        success: false,
-        message: 'You are using an expired Otp',
-      });
-      return;
-    }
-    const rightOtpfind = otpHolder[otpHolder.length - 1];
-    console.log(pass);
-    const validUser = await bcrypt.compare(otp, rightOtpfind.otp);
-    if (rightOtpfind.email == req.body.email && validUser) {
-      const user = new Users({ email: email, password: pass });
-      await user.save();
-      await userSignUp({
-        from: process.env.EMAIL,
-        to: req.body.email,
-        subject: "Anish's Artstore",
-        template: 'signUp',
-        templateVars: {
-          emailAddress: req.body.email,
-          name: req.body.name,
-        },
-      });
-      const token = await user.generateAuthToken();
-      const deleteOtp = await Otp.deleteMany({
-        email: rightOtpfind.email,
-      });
-      res.status(200).send({
-        success: true,
-        message: 'New User created successfully',
-        user,
-        token,
-      });
-    } else {
-      res.status(400).send({
-        success: false,
-        message: 'Plz enter the correct OTP',
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+// const verifyOtp = async (req, res) => {
+//   const pass = signupPassword;
+//   try {
+//     const email = req.body.email;
+//     const otp = req.body.otp;
+//     const otpHolder = await Otp.find({
+//       email: email,
+//     });
+//     if (otpHolder.length === 0) {
+//       res.status(400).send({
+//         success: false,
+//         message: 'You are using an expired Otp',
+//       });
+//       return;
+//     }
+//     const rightOtpfind = otpHolder[otpHolder.length - 1];
+//     console.log(pass);
+//     const validUser = await bcrypt.compare(otp, rightOtpfind.otp);
+//     if (rightOtpfind.email == req.body.email && validUser) {
+//       const user = new Users({ email: email, password: pass });
+//       await user.save();
+//       await userSignUp({
+//         from: process.env.EMAIL,
+//         to: req.body.email,
+//         subject: "Anish's Artstore",
+//         template: 'signUp',
+//         templateVars: {
+//           emailAddress: req.body.email,
+//           name: req.body.name,
+//         },
+//       });
+//       const token = await user.generateAuthToken();
+//       const deleteOtp = await Otp.deleteMany({
+//         email: rightOtpfind.email,
+//       });
+//       res.status(200).send({
+//         success: true,
+//         message: 'New User created successfully',
+//         user,
+//         token,
+//       });
+//     } else {
+//       res.status(400).send({
+//         success: false,
+//         message: 'Plz enter the correct OTP',
+//       });
+//     }
+//   } catch (error) {
+//     console.log(error);
+//     res.status(400).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
 
 // logging in an user
 
@@ -274,29 +231,29 @@ const updateUser = async (req, res) => {
         : req.body.password,
     };
 
-    updateData.password
-      ? await userPassword({
-          from: process.env.EMAIL,
-          to: req.body.email,
-          subject: "Anish's Artstore",
-          template: 'updateProfile',
-          templateVars: {
-            emailAddress: req.body.email,
-            name: req.body.name,
-            resetLink,
-          },
-        })
-      : await userUpdate({
-          from: process.env.EMAIL,
-          to: req.body.email,
-          subject: "Anish's Artstore",
-          template: 'signUp',
-          templateVars: {
-            emailAddress: req.body.email,
-            name: req.body.name,
-            resetLink,
-          },
-        });
+    // updateData.password
+    //   ? await userPassword({
+    //       from: process.env.EMAIL,
+    //       to: req.body.email,
+    //       subject: "Anish's Artstore",
+    //       template: 'updateProfile',
+    //       templateVars: {
+    //         emailAddress: req.body.email,
+    //         name: req.body.name,
+    //         resetLink,
+    //       },
+    //     })
+    //   : await userUpdate({
+    //       from: process.env.EMAIL,
+    //       to: req.body.email,
+    //       subject: "Anish's Artstore",
+    //       template: 'signUp',
+    //       templateVars: {
+    //         emailAddress: req.body.email,
+    //         name: req.body.name,
+    //         resetLink,
+    //       },
+    //     });
     const found = await Users.updateOne(
       user,
       { $set: updateData },
@@ -358,17 +315,17 @@ const forgotPassword = async (req, res) => {
     const newToken = jwt.sign(payload, secret, { expiresIn: '15m' });
     console.log(newToken);
     const link = `http://localhost:3001/api/artstore/users/reset-password/${user._id}/${newToken}`;
-    await userPasswordReset({
-      from: process.env.EMAIL,
-      to: req.body.email,
-      subject: "Anish's Artstore",
-      template: 'updatePassword',
-      templateVars: {
-        emailAddress: user.email,
-        name: user.name,
-        resetLink: link,
-      },
-    });
+    // await userPasswordReset({
+    //   from: process.env.EMAIL,
+    //   to: req.body.email,
+    //   subject: "Anish's Artstore",
+    //   template: 'updatePassword',
+    //   templateVars: {
+    //     emailAddress: user.email,
+    //     name: user.name,
+    //     resetLink: link,
+    //   },
+    // });
     res.status(201).send({
       success: true,
       message: 'Password reset link was sent to your registered EmailId',
@@ -424,9 +381,120 @@ const resetPassword = async (req, res) => {
     });
   }
 };
+// let signupPassword;
+// const signupUser = async (req, res) => {
+//   signupPassword = req.body.password;
+//   const email = req.body.email;
+//   try {
+//     const userAdd = await Users.findOne({ email: email });
+//     if (userAdd) {
+//       res.status(400).json({
+//         success: false,
+//         message: 'User already registered,Try Signing In',
+//       });
+//       return;
+//     }
+//     const OTP = otpGenerator.generate(6, {
+//       digits: true,
+//       lowerCaseAlphabets: false,
+//       upperCaseAlphabets: false,
+//       specialChars: false,
+//     });
+//     console.log(OTP);
+//     const otp = new Otp({ email: req.body.email, otp: OTP });
+//     const salt = await bcrypt.genSalt(10);
+//     otp.otp = await bcrypt.hash(otp.otp, salt);
+//     const result = await otp.save();
+//     await otpSend({
+//       from: process.env.EMAIL,
+//       to: email,
+//       subject: "Anish's Artstore",
+//       template: 'otp',
+//       templateVars: {
+//         emailAddress: req.body.email,
+//         otp: OTP,
+//       },
+//     });
+//     res.status(200).send({
+//       success: true,
+//       message: 'OTP sent successfully to your registered email-Id',
+//     });
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+
+let phoneNo;
+const signUpUser = async (req, res) => {
+  const { name, userName, email, password } = req.body;
+  phoneNo = req.body.phoneNo;
+  try {
+    const userAdd = await Users.findOne({ email: email });
+    if (userAdd) {
+      return res.status(400).json({
+        success: false,
+        message: 'User already registered,Try Signing In',
+      });
+    }
+    const userRuserName = await Users.findOne({ userName: userName });
+    console.log(userRuserName);
+    if (userRuserName) {
+      return res.status(400).json({
+        success: false,
+        message: 'UserName Already taken,try using another username',
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: 'Proceed',
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+const verifyPhone = async (req, res) => {
+  try {
+    client.verify
+      .services(TWILIO_SERVICE_ID)
+      .verifications.create({
+        to: '+917021068801',
+        channel: 'sms',
+      })
+      .then((data) => {
+        res.status(200).json(data);
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+const verifyOtp = async (req, res) => {
+  client.verify
+    .services(process.env.TWILIO_SERVICE_ID)
+    .verificationChecks.create({
+      to: phoneNo,
+      code: req.body.code,
+    })
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((error) => {
+      res.status(400).json(error);
+    });
+};
 
 export {
-  signupUser,
+  verifyPhone,
+  signUpUser,
   uploadImg1,
   userLogin,
   logoutUser,

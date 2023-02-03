@@ -1,6 +1,7 @@
 import express from 'express';
 import {
-  signupUser,
+  verifyPhone,
+  signUpUser,
   uploadImg1,
   userLogin,
   logoutUser,
@@ -15,7 +16,8 @@ import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/register', signupUser); // register users
+router.post('/register', signUpUser); // register users
+router.post('/register/verify', verifyPhone); // register users
 router.post('/register/otpCheck', verifyOtp); // register users
 router.post('/login', userLogin); // logging users
 router.post('/logout', protect, logoutUser); //logout user

@@ -1,8 +1,8 @@
-import nodemailer from 'nodemailer';
-import fs from 'fs';
-import ejs from 'ejs';
-import juice from 'juice';
-import dotenv from 'dotenv';
+const nodemailer = require('nodemailer');
+const fs = require('fs');
+const ejs = require('ejs');
+const juice = require('juice');
+const dotenv = require('dotenv');
 dotenv.config();
 
 let transporter = nodemailer.createTransport({

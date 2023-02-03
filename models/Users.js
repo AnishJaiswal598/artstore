@@ -9,6 +9,15 @@ const userSchema = new Schema(
     name: {
       type: String,
       trim: true,
+      required: true,
+    },
+    phoneNo: {
+      type: Number,
+    },
+    userName: {
+      type: String,
+      required: true,
+      unique: true,
     },
     email: {
       type: Schema.Types.String,
